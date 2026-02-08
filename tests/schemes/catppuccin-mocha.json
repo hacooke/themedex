@@ -1,0 +1,35 @@
+{
+    "name": "Catppuccin Mocha",
+    "system": "base24",
+    "variant": "dark",
+    "palette": {
+        "color00": "#1e1e2e",
+        "color01": "#313244",
+        "color02": "#45475a",
+        "color03": "#6c7086",
+        "color04": "#a6adc8",
+        "color05": "#cdd6f4",
+        "color06": "#f5e0dc",
+        "color07": "#b4befe",
+        "color08": "#f38ba8",
+        "color09": "#fab387",
+        "color10": "#f9e2af",
+        "color11": "#a6e3a1",
+        "color12": "#94e2d5",
+        "color13": "#89b4fa",
+        "color14": "#cba6f7",
+        "color15": "#f2cdcd",
+        "color16": "#181825",
+        "color17": "#11111b",
+        "color18": "#eba0ac",
+        "color19": "#f5e0dc",
+        "color20": "#a6e3a1",
+        "color21": "#89dceb",
+        "color22": "#74c7ec",
+        "color23": "#f5c2e7"
+    },
+    "tools": {
+        "neovim": "catppuccin-mocha",
+        "ghostty": "Catppuccin Mocha"
+    }
+}
