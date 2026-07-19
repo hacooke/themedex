@@ -36,7 +36,7 @@ impl<T: HasConnection> ImportAgent<T> {
         };
         // Guard against pre-existing color scheme if update is false
         let exists_check =
-            ColorScheme::select_by_name_if_exists(scheme_name, self.conn.connection())?;
+            ColorScheme::select_by_name_if_exists(scheme_name, self.conn.conn())?;
         if !update && let Some(_) = exists_check {
             return Err(internal_error(
                 "Imported color scheme already exists and update not specified.",
@@ -52,7 +52,7 @@ impl<T: HasConnection> ImportAgent<T> {
             }
             None => {
                 let mut new_scheme = ColorScheme::new(scheme_name.to_string(), color_data);
-                new_scheme.insert_to_db(self.conn.connection())?;
+                new_scheme.insert_to_db(self.conn.conn())?;
                 Ok(new_scheme)
             }
         }
@@ -65,8 +65,10 @@ impl<T: HasConnection> ImportAgent<T> {
         name: Option<&str>,
         update: bool,
     ) -> Result<(Wallpaper, WallpaperVersion), ThemedexError> {
-        let wallpaper = self.import_wallpaper(path, name, update)?;
+        let mut wallpaper = self.import_wallpaper(path, name, update)?;
         let version = self.import_wallpaper_version(path, &wallpaper, color_scheme, update)?;
+        wallpaper.default_version_id = version.id;
+        wallpaper.sync_to_db(self.conn.conn())?;
         Ok((wallpaper, version))
     }
 
@@ -82,7 +84,7 @@ impl<T: HasConnection> ImportAgent<T> {
             None => get_name_from_path(path)?,
         };
         // Guard against pre-existing color scheme if update is false
-        let exists_check = Wallpaper::select_by_name_if_exists(wall_name, self.conn.connection())?;
+        let exists_check = Wallpaper::select_by_name_if_exists(wall_name, self.conn.conn())?;
         if !update && let Some(_) = exists_check {
             return Err(internal_error(
                 "Imported wallpaper already exists and update not specified.",
@@ -103,7 +105,7 @@ impl<T: HasConnection> ImportAgent<T> {
             None => {
                 let mut new_wallpaper =
                     Wallpaper::new(wall_name.to_string(), wall_dir_path.to_string());
-                new_wallpaper.insert_to_db(self.conn.connection())?;
+                new_wallpaper.insert_to_db(self.conn.conn())?;
                 Ok(new_wallpaper)
             }
         }
@@ -118,7 +120,7 @@ impl<T: HasConnection> ImportAgent<T> {
     ) -> Result<WallpaperVersion, ThemedexError> {
         self.import_wallpaper_version(
             path,
-            &Wallpaper::select_by_name(wallpaper_name, self.conn.connection())?,
+            &Wallpaper::select_by_name(wallpaper_name, self.conn.conn())?,
             color_scheme_name,
             update,
         )
@@ -136,10 +138,10 @@ impl<T: HasConnection> ImportAgent<T> {
         // but there is no image there then the entry would be broken.
         // Get color scheme
         let Ok(color_scheme) =
-            ColorScheme::select_by_name(color_scheme_name, self.conn.connection())
+            ColorScheme::select_by_name(color_scheme_name, self.conn.conn())
         else {
-            return Err(internal_error(
-                "Color scheme {color_scheme_name} does not exist.",
+            return Err(ThemedexError::Internal(
+                format!("Color scheme {color_scheme_name} does not exist."),
             ));
         };
         // Get new file location
@@ -147,7 +149,7 @@ impl<T: HasConnection> ImportAgent<T> {
         copy_image(path.into(), destination_path, update)?;
         // Create variant in DB (ignore if fails due to unique constraint violation)
         let mut wallpaper_version = WallpaperVersion::new(wallpaper, &color_scheme)?;
-        match wallpaper_version.insert_to_db(self.conn.connection()) {
+        match wallpaper_version.insert_to_db(self.conn.conn()) {
             Ok(_) => Ok(()),
             Err(Database(SqliteFailure(e, _))) if e.extended_code == SQLITE_CONSTRAINT_UNIQUE => {
                 Ok(())

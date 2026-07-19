@@ -1,4 +1,4 @@
-use crate::common::ThemedexError;
+use crate::common::{ThemedexError, internal_error};
 use crate::database::models::{ColorScheme, Wallpaper, WallpaperVersion};
 use rusqlite::{Connection, Error::QueryReturnedNoRows, params};
 
@@ -13,6 +13,7 @@ pub trait DatabaseTable: Sized {
             Ok(_) => Ok(false),
         }
     }
+    fn sync_to_db(&self, conn: &Connection) -> Result<(), ThemedexError>;
 }
 
 pub trait TableWithName: Sized {
@@ -66,6 +67,18 @@ impl DatabaseTable for ColorScheme {
         )?;
         Ok(res)
     }
+
+    fn sync_to_db(&self, conn: &Connection) -> Result<(), ThemedexError> {
+        let id = self
+            .id
+            .ok_or_else(|| internal_error("sync_to_db called for struct with no ID"))?;
+        let json_colors = serde_json::to_string(&self.colors)?;
+        conn.execute(
+            "UPDATE color_scheme SET name = ?1, colors_json = ?2 WHERE id = ?3",
+            params![self.name, json_colors, id],
+        )?;
+        Ok(())
+    }
 }
 
 impl TableWithName for ColorScheme {
@@ -111,6 +124,17 @@ impl DatabaseTable for Wallpaper {
         )?;
         Ok(res)
     }
+
+    fn sync_to_db(&self, conn: &Connection) -> Result<(), ThemedexError> {
+        let id = self
+            .id
+            .ok_or_else(|| internal_error("sync_to_db called for struct with no ID"))?;
+        conn.execute(
+            "UPDATE wallpaper SET name = ?1, path = ?2, default_version_id = ?3 WHERE id = ?4",
+            params![self.name, self.path, self.default_version_id, id],
+        )?;
+        Ok(())
+    }
 }
 
 impl TableWithName for Wallpaper {
@@ -154,6 +178,17 @@ impl DatabaseTable for WallpaperVersion {
             Self::from_row,
         )?;
         Ok(res)
+    }
+
+    fn sync_to_db(&self, conn: &Connection) -> Result<(), ThemedexError> {
+        let id = self
+            .id
+            .ok_or_else(|| internal_error("sync_to_db called for struct with no ID"))?;
+        conn.execute(
+            "UPDATE wallpaper_version SET wallpaper_id = ?1, color_scheme_id = ?2 WHERE id = ?3",
+            params![self.wallpaper_id, self.color_scheme_id, id],
+        )?;
+        Ok(())
     }
 }
 

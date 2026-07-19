@@ -26,13 +26,20 @@ pub struct WallpaperVersion {
     pub color_scheme_id: u32,
 }
 
+#[derive(Debug)]
+pub struct WallpaperVersionNames {
+    pub wallpaper_name: String,
+    pub color_scheme_name: String,
+}
+
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct SchemeJson {
-    name: String,
-    system: SchemeSystem,
-    variant: SchemeVariant,
-    palette: ColorPalette,
-    tools: HashMap<String, String>,
+    pub name: String,
+    pub system: SchemeSystem,
+    pub variant: SchemeVariant,
+    pub palette: ColorPalette,
+    pub extra: HashMap<String, String>,
+    pub tools: HashMap<String, String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
