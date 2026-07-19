@@ -8,6 +8,8 @@ pub enum ThemedexError {
     Database(#[from] rusqlite::Error),
     #[error(transparent)]
     Json(#[from] serde_json::Error),
+    #[error(transparent)]
+    Template(#[from] minijinja::Error),
     #[error("Themedex internal error: {0}")]
     Internal(String),
     #[error("Unknown error")]
@@ -27,3 +29,17 @@ impl<T> ToInternal<T> for Option<T> {
         self.ok_or(ThemedexError::Internal(msg.to_string()))
     }
 }
+
+impl ThemedexError {
+    pub fn user_message(&self) -> String {
+        match self {
+            Self::Internal(msg) => msg.clone(), 
+            Self::Io(e) => e.to_string(),
+            Self::Database(e) => e.to_string(),
+            Self::Json(e) => e.to_string(),
+            Self::Template(e) => e.to_string(),
+            Self::Unknown => "Unknown error".to_string(),
+        }
+    }
+}
+

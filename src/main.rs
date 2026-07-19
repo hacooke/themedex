@@ -1,12 +1,19 @@
-pub mod database;
+pub mod cli;
 
-pub mod common;
-
-pub mod import;
+use clap::Parser;
+use cli::Cli;
+use themedex::config::ThemedexConfig;
 
 fn main() {
-    database::init_db("test.db").unwrap();
-    println!("Hello, world!");
+    let cli = Cli::parse();
+    // TODO: implement Cli::get_config to generate a get_config
+    // * Argument to set config location, else look in a default
+    // * Arguments to override config options
+    let config = ThemedexConfig{
+        wallpaper_directory: "tests/tempwalls".into(),
+        database_directory: "tests/temp.db".into(),
+    };
+    cli.command.execute(&config);
 }
 
 // themedex
