@@ -1,6 +1,7 @@
 pub mod interfaces;
 pub mod models;
 pub mod utils;
+pub mod query;
 
 use rusqlite::{Connection, Result};
 
