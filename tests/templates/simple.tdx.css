@@ -1,0 +1,10 @@
+/* {{ name }} */
+@define-color fg-main  {{ foreground }};
+@define-color fg-alt   {{ palette.color00 }};
+@define-color bg-main  {{ background }};
+@define-color bg-alt   {{ palette.color02 }};
+@define-color bg-hover {{ palette.color03 }};
+@define-color hl-main  {{ palette.color15 }};
+@define-color warning  {{ extra.warning or palette.color10 }};
+@define-color error    {{ extra.error or palette.color08 }};
+/* {{ tools.neovim or name }} */

@@ -28,6 +28,11 @@
         "color22": "#74c7ec",
         "color23": "#f5c2e7"
     },
+    "extra": {
+        "background": "#1f2335",
+        "warning": "#fab387",
+        "error": "#f38ba8"
+    },
     "tools": {
         "neovim": "catppuccin-mocha",
         "ghostty": "Catppuccin Mocha"

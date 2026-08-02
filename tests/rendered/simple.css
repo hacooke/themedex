@@ -1,0 +1,10 @@
+/* Catppuccin Mocha */
+@define-color fg-main  #cdd6f4;
+@define-color fg-alt   #1e1e2e;
+@define-color bg-main  #1f2335;
+@define-color bg-alt   #45475a;
+@define-color bg-hover #6c7086;
+@define-color hl-main  #f2cdcd;
+@define-color warning  #fab387;
+@define-color error    #f38ba8;
+/* catppuccin-mocha */
