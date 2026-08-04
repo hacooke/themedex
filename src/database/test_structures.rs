@@ -1,6 +1,9 @@
 use rusqlite::Connection;
 
-use crate::database::utils::HasConnection;
+use crate::{
+    common::test_fixtures::catppuccin_mocha_json,
+    database::{models::ColorScheme, utils::HasConnection},
+};
 
 pub struct TestDb {
     pub conn: Option<Connection>,
@@ -8,7 +11,7 @@ pub struct TestDb {
 }
 
 impl HasConnection for TestDb {
-    fn connection(&self) -> &Connection {
+    fn conn(&self) -> &Connection {
         self.conn.as_ref().unwrap()
     }
 }
@@ -20,10 +23,6 @@ impl TestDb {
             path: path.to_string(),
         }
     }
-
-    pub fn conn(&self) -> &Connection {
-        self.conn.as_ref().unwrap()
-    }
 }
 
 impl Drop for TestDb {
@@ -33,4 +32,8 @@ impl Drop for TestDb {
         }
         std::fs::remove_file(&self.path).unwrap();
     }
+}
+
+pub fn create_test_color_scheme(name: &str) -> ColorScheme {
+    ColorScheme::new(name.to_string(), catppuccin_mocha_json())
 }

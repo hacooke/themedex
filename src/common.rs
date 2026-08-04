@@ -1,4 +1,8 @@
+pub mod path;
+pub mod models;
+
 use thiserror::Error;
+use toml::de::Error;
 
 #[derive(Error, Debug)]
 pub enum ThemedexError {
@@ -8,6 +12,8 @@ pub enum ThemedexError {
     Database(#[from] rusqlite::Error),
     #[error(transparent)]
     Json(#[from] serde_json::Error),
+    #[error(transparent)]
+    Toml(#[from] Error),
     #[error(transparent)]
     Template(#[from] minijinja::Error),
     #[error("Themedex internal error: {0}")]
@@ -37,9 +43,12 @@ impl ThemedexError {
             Self::Io(e) => e.to_string(),
             Self::Database(e) => e.to_string(),
             Self::Json(e) => e.to_string(),
+            Self::Toml(e) => e.to_string(),
             Self::Template(e) => e.to_string(),
             Self::Unknown => "Unknown error".to_string(),
         }
     }
 }
 
+#[cfg(test)]
+pub mod test_fixtures;

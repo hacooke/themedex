@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
-use crate::common::ThemedexError;
+use crate::common::{ThemedexError, models::SchemeJson};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ColorScheme {
@@ -30,58 +28,6 @@ pub struct WallpaperVersion {
 pub struct WallpaperVersionNames {
     pub wallpaper_name: String,
     pub color_scheme_name: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
-pub struct SchemeJson {
-    pub name: String,
-    pub system: SchemeSystem,
-    pub variant: SchemeVariant,
-    pub palette: ColorPalette,
-    pub extra: HashMap<String, String>,
-    pub tools: HashMap<String, String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
-pub struct ColorPalette {
-    color00: String,
-    color01: String,
-    color02: String,
-    color03: String,
-    color04: String,
-    color05: String,
-    color06: String,
-    color07: String,
-    color08: String,
-    color09: String,
-    color10: String,
-    color11: String,
-    color12: String,
-    color13: String,
-    color14: String,
-    color15: String,
-    color16: Option<String>,
-    color17: Option<String>,
-    color18: Option<String>,
-    color19: Option<String>,
-    color20: Option<String>,
-    color21: Option<String>,
-    color22: Option<String>,
-    color23: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
-pub enum SchemeSystem {
-    Base16,
-    Base24,
-}
-
-#[derive(Debug, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all = "camelCase")]
-pub enum SchemeVariant {
-    Light,
-    Dark,
 }
 
 impl ColorScheme {

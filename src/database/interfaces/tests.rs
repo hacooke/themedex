@@ -1,19 +1,12 @@
 use super::*;
-use crate::database::test_structures::TestDb;
-use std::fs;
-
-fn create_test_color_scheme() -> ColorScheme {
-    let file_contents = fs::read_to_string("tests/schemes/catppuccin-mocha.json").unwrap();
-    let colors = serde_json::from_str(&file_contents).unwrap();
-    ColorScheme::new(String::from("test"), colors)
-}
+use crate::database::{test_structures::{TestDb, create_test_color_scheme}, utils::HasConnection};
 
 #[test]
 fn test_create_and_select_color_scheme() -> Result<(), ThemedexError> {
     // Arrange
     let db = TestDb::new("test_create_and_select_color_scheme.db");
     // Act
-    let mut color_scheme = create_test_color_scheme();
+    let mut color_scheme = create_test_color_scheme("test-color-scheme");
     color_scheme.insert_to_db(db.conn())?;
     assert!(color_scheme.id.unwrap() > 0);
     let selected = ColorScheme::select_by_id(color_scheme.id.unwrap(), db.conn())?;
@@ -45,7 +38,7 @@ fn test_create_and_select_wallpaper_null_default() -> Result<(), ThemedexError> 
 fn test_create_and_select_wallpaper_version() -> Result<(), ThemedexError> {
     // Arrange
     let db = TestDb::new("test_create_and_select_wallpaper_version");
-    let mut color_scheme = create_test_color_scheme();
+    let mut color_scheme = create_test_color_scheme("test-color-scheme");
     color_scheme.insert_to_db(db.conn())?;
     let mut wallpaper = Wallpaper::new(String::from("test"), String::from("testpath"));
     wallpaper.insert_to_db(db.conn())?;
