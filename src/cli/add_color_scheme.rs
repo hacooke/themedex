@@ -21,8 +21,8 @@ pub struct AddSchemeArgs {
 pub fn execute(args: &AddSchemeArgs, config: &ThemedexConfig) -> Result<(), ThemedexError> {
     println!("{:?}", args);
     let agent = ImportAgent {
-        wallpaper_directory: config.wallpaper_directory.clone(),
-        conn: ThemedexDb::new(&config.database_directory),
+        wallpaper_directory: config.directories.wallpaper_directory.clone(),
+        conn: ThemedexDb::new(&config.directories.database_directory),
     };
     agent.import_color_scheme_json(&args.path, args.name.as_deref(), args.update)?;
     Ok(())

@@ -23,8 +23,8 @@ pub struct AddWallpaperArgs {
 pub fn execute(args: &AddWallpaperArgs, config: &ThemedexConfig) -> Result<(), ThemedexError> {
     println!("{:?} {:?}", args, config);
     let agent = ImportAgent {
-        wallpaper_directory: config.wallpaper_directory.clone(),
-        conn: ThemedexDb::new(&config.database_directory),
+        wallpaper_directory: config.directories.wallpaper_directory.clone(),
+        conn: ThemedexDb::new(&config.directories.database_directory),
     };
     agent.import_wallpaper_and_version(&args.path, &args.color_scheme, args.name.as_deref(), args.update)?;
     Ok(())

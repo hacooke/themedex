@@ -16,7 +16,7 @@ pub struct ListColorSchemesArgs {
 
 pub fn execute(args: &ListColorSchemesArgs, config: &ThemedexConfig) -> Result<(), ThemedexError> {
     println!("{:?} {:?}", args, config);
-    let db = ThemedexDb::new(&config.database_directory);
+    let db = ThemedexDb::new(&config.directories.database_directory);
     let wallpapers = query::list_color_scheme_names(args.name.as_deref(), db.conn())?;
     for name in wallpapers {
         println!("{}", name)
