@@ -19,20 +19,8 @@ Build core functionality first, add UI later
 
 #### Adding to database
 
-+ Add colour scheme from JSON file
-    * Options for how to handle existing schemes, ignore or replace
-
 + Bulk add colour schemes
-
-+ Add wallpaper by path, specifying associated scheme
-    * Optional name argument, otherwise use name of file
-    * Check name is unique
-    * Moves wallpaper to themedex directory
-        - creates directory with wallpaper name and adds wallpaper as a variant
-        - variant named for associated colour scheme
-
-+ Add variant to existing wallpaper, giving root wallpaper, path, and colour scheme
-    * Renames and moves to correct file location, per above rules
+    * Perhaps just handle in CLI with shell path expansion
 
 #### Applying themes
 
@@ -86,6 +74,16 @@ For Light Themes:
     color00: Default Background (usually white/off-white).
     color05: Default Foreground (usually dark grey/black).
     color06: Cursor / Selection.
+
+Approximate mappings to primary colours (not reliable at all!)
+Black: base00
+Red: base08
+Green: base0B
+Yellow: base0A
+Blue: base0D
+Magenta: base0E
+Cyan: base0C
+White: base05
 
 Want to scrape themes from
 https://github.com/tinted-theming/schemes
