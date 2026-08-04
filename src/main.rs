@@ -2,16 +2,20 @@ pub mod cli;
 
 use clap::Parser;
 use cli::Cli;
-use themedex::config::ThemedexConfig;
+use themedex::config::{DirectoryConfig, ThemedexConfig};
 
 fn main() {
     let cli = Cli::parse();
     // TODO: implement Cli::get_config to generate a get_config
     // * Argument to set config location, else look in a default
     // * Arguments to override config options
-    let config = ThemedexConfig{
-        wallpaper_directory: "tests/tempwalls".into(),
-        database_directory: "tests/temp.db".into(),
+    let config = ThemedexConfig {
+        directories: DirectoryConfig {
+            wallpaper_directory: "tests/tempwalls".into(),
+            database_directory: "tests/temp.db".into(),
+            template_directory: "tests/templates_tmp".into(),
+            rendered_config_directory: "tests/rendered".into(),
+        },
     };
     cli.command.execute(&config);
 }
