@@ -1,5 +1,7 @@
 use clap::Args;
-use themedex::{apply::validate_all_templates, common::ThemedexError, config::ThemedexConfig};
+use themedex::{
+    apply::templates::validate_all_templates, common::ThemedexError, config::ThemedexConfig,
+};
 
 #[derive(Args, Debug)]
 pub struct ValidateTemplatesArgs {}

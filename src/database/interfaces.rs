@@ -154,6 +154,7 @@ impl DatabaseTable for WallpaperVersion {
             id: Some(row.get(0)?),
             wallpaper_id: row.get(1)?,
             color_scheme_id: row.get(2)?,
+            filename: row.get(3)?,
         })
     }
 
@@ -164,8 +165,8 @@ impl DatabaseTable for WallpaperVersion {
             )));
         }
         self.id = conn.query_row(
-            "INSERT INTO wallpaper_version (wallpaper_id, color_scheme_id) VALUES (?1, ?2) RETURNING id",
-            params![self.wallpaper_id, self.color_scheme_id],
+            "INSERT INTO wallpaper_version (wallpaper_id, color_scheme_id, filename) VALUES (?1, ?2, ?3) RETURNING id",
+            params![self.wallpaper_id, self.color_scheme_id, self.filename],
             |row| row.get(0),
         )?;
         Ok(())
@@ -173,7 +174,7 @@ impl DatabaseTable for WallpaperVersion {
 
     fn select_by_id(id: u32, conn: &Connection) -> Result<Self, ThemedexError> {
         let res = conn.query_row(
-            "SELECT id, wallpaper_id, color_scheme_id FROM wallpaper_version WHERE id = ?1",
+            "SELECT id, wallpaper_id, color_scheme_id, filename FROM wallpaper_version WHERE id = ?1",
             params![id],
             Self::from_row,
         )?;
@@ -185,8 +186,8 @@ impl DatabaseTable for WallpaperVersion {
             .id
             .ok_or_else(|| internal_error("sync_to_db called for struct with no ID"))?;
         conn.execute(
-            "UPDATE wallpaper_version SET wallpaper_id = ?1, color_scheme_id = ?2 WHERE id = ?3",
-            params![self.wallpaper_id, self.color_scheme_id, id],
+            "UPDATE wallpaper_version SET wallpaper_id = ?1, color_scheme_id = ?2, filename = ?3 WHERE id = ?4",
+            params![self.wallpaper_id, self.color_scheme_id, self.filename, id],
         )?;
         Ok(())
     }

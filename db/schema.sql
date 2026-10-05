@@ -19,10 +19,12 @@ CREATE TABLE IF NOT EXISTS wallpaper_version (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     wallpaper_id INTEGER NOT NULL,
     color_scheme_id INTEGER NOT NULL,
+    filename TEXT NOT NULL,
 
     FOREIGN KEY (wallpaper_id) REFERENCES wallpaper(id) ON DELETE CASCADE,
     FOREIGN KEY (color_scheme_id) REFERENCES color_scheme(id) ON DELETE CASCADE,
-    UNIQUE (wallpaper_id, color_scheme_id)
+    UNIQUE (wallpaper_id, color_scheme_id),
+    UNIQUE (wallpaper_id, filename)
 );
 
 COMMIT;

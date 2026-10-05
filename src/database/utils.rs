@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use rusqlite::Connection;
 
 pub trait HasConnection {
@@ -9,7 +11,7 @@ pub struct ThemedexDb {
 }
 
 impl ThemedexDb {
-    pub fn new(path: &str) -> Self {
+    pub fn new(path: impl AsRef<Path>) -> Self {
         Self {
             conn: Some(crate::database::init_db(path).unwrap()),
         }

@@ -21,7 +21,7 @@ pub fn execute(args: &AddWallpaperVersionArgs, config: &ThemedexConfig) -> Resul
     println!("{:?}", args);
     let agent = ImportAgent {
         wallpaper_directory: config.directories.wallpaper_directory.clone(),
-        conn: ThemedexDb::new(&config.directories.database_directory),
+        conn: ThemedexDb::new(&config.directories.database_path),
     };
     agent.import_wallpaper_version_by_wall_name(&args.path, &args.wallpaper, &args.color_scheme, args.update)?;
     Ok(())

@@ -1,7 +1,9 @@
 pub mod add_color_scheme;
 pub mod add_wallpaper;
 pub mod add_wallpaper_version;
+pub mod apply_templates;
 pub mod list_color_schemes;
+pub mod list_config;
 pub mod list_wallpaper_versions;
 pub mod list_wallpapers;
 pub mod validate_templates;
@@ -14,12 +16,18 @@ use add_wallpaper_version::AddWallpaperVersionArgs;
 use themedex::config::ThemedexConfig;
 
 use crate::cli::{
-    list_color_schemes::ListColorSchemesArgs, list_wallpaper_versions::ListWallpaperVersionsArgs,
-    list_wallpapers::ListWallpapersArgs, validate_templates::ValidateTemplatesArgs,
+    apply_templates::ApplyTemplatesArgs, list_color_schemes::ListColorSchemesArgs,
+    list_wallpaper_versions::ListWallpaperVersionsArgs, list_wallpapers::ListWallpapersArgs,
+    validate_templates::ValidateTemplatesArgs,
 };
 
 #[derive(Parser)]
 pub struct Cli {
+    #[arg(
+        long,
+        help = "Path to config file (default: $XDG_CONFIG_HOME/themedex/config.toml)"
+    )]
+    pub config: Option<String>,
     #[clap(subcommand)]
     pub command: ThemedexCommands,
 }
@@ -34,7 +42,11 @@ pub enum ThemedexCommands {
     #[command(visible_alias = "ls")]
     ListWallpaperVersions(ListWallpaperVersionsArgs),
     ValidateTemplates(ValidateTemplatesArgs),
+    ApplyTemplates(ApplyTemplatesArgs),
+    ListConfig,
 }
+
+// TODO select theme (set wallpaper plus apply templates)
 
 impl ThemedexCommands {
     pub fn execute(&self, config: &ThemedexConfig) {
@@ -46,6 +58,11 @@ impl ThemedexCommands {
             Self::ListWallpapers(args) => list_wallpapers::execute(args, config),
             Self::ListWallpaperVersions(args) => list_wallpaper_versions::execute(args, config),
             Self::ValidateTemplates(args) => validate_templates::execute(args, config),
+            Self::ApplyTemplates(args) => apply_templates::execute(args, config),
+            Self::ListConfig => {
+                list_config::execute(config);
+                Ok(())
+            }
         };
         if let Err(error) = result {
             println!("Action failed: {}", error.user_message())

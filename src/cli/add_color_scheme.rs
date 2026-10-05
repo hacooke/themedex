@@ -1,5 +1,7 @@
 use clap::Args;
-use themedex::{common::ThemedexError, config::ThemedexConfig, database::utils::ThemedexDb, import::ImportAgent};
+use themedex::{
+    common::ThemedexError, config::ThemedexConfig, database::utils::ThemedexDb, import::ImportAgent,
+};
 
 #[derive(Args, Debug)]
 pub struct AddSchemeArgs {
@@ -22,7 +24,7 @@ pub fn execute(args: &AddSchemeArgs, config: &ThemedexConfig) -> Result<(), Them
     println!("{:?}", args);
     let agent = ImportAgent {
         wallpaper_directory: config.directories.wallpaper_directory.clone(),
-        conn: ThemedexDb::new(&config.directories.database_directory),
+        conn: ThemedexDb::new(&config.directories.database_path),
     };
     agent.import_color_scheme_json(&args.path, args.name.as_deref(), args.update)?;
     Ok(())

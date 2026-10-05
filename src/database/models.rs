@@ -22,6 +22,7 @@ pub struct WallpaperVersion {
     pub id: Option<u32>,
     pub wallpaper_id: u32,
     pub color_scheme_id: u32,
+    pub filename: String,
 }
 
 #[derive(Debug)]
@@ -52,7 +53,11 @@ impl Wallpaper {
 }
 
 impl WallpaperVersion {
-    pub fn new(wallpaper: &Wallpaper, color_scheme: &ColorScheme) -> Result<Self, ThemedexError> {
+    pub fn new(
+        wallpaper: &Wallpaper,
+        color_scheme: &ColorScheme,
+        filename: String,
+    ) -> Result<Self, ThemedexError> {
         let Some(wallpaper_id) = wallpaper.id else {
             return Err(ThemedexError::Internal(String::from(
                 "Tried to create wallpaper version from wallpaper which is not in database.",
@@ -67,6 +72,7 @@ impl WallpaperVersion {
             id: None,
             wallpaper_id,
             color_scheme_id,
+            filename,
         })
     }
 }

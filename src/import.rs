@@ -18,7 +18,7 @@ use crate::{
 };
 
 pub struct ImportAgent<T: HasConnection> {
-    pub wallpaper_directory: String,
+    pub wallpaper_directory: PathBuf,
     pub conn: T,
 }
 
@@ -35,8 +35,7 @@ impl<T: HasConnection> ImportAgent<T> {
             None => get_name_from_path(path)?,
         };
         // Guard against pre-existing color scheme if update is false
-        let exists_check =
-            ColorScheme::select_by_name_if_exists(scheme_name, self.conn.conn())?;
+        let exists_check = ColorScheme::select_by_name_if_exists(scheme_name, self.conn.conn())?;
         if !update && let Some(_) = exists_check {
             return Err(internal_error(
                 "Imported color scheme already exists and update not specified.",
@@ -65,6 +64,13 @@ impl<T: HasConnection> ImportAgent<T> {
         name: Option<&str>,
         update: bool,
     ) -> Result<(Wallpaper, WallpaperVersion), ThemedexError> {
+        // Validate color scheme exists first
+        if ColorScheme::select_by_name_if_exists(color_scheme, self.conn.conn())?.is_none() {
+            return Err(ThemedexError::Internal(format!(
+                "Color scheme {color_scheme} does not exist."
+            )));
+        };
+        // Create wallpaper (outer group)
         let mut wallpaper = self.import_wallpaper(path, name, update)?;
         let version = self.import_wallpaper_version(path, &wallpaper, color_scheme, update)?;
         wallpaper.default_version_id = version.id;
@@ -83,7 +89,7 @@ impl<T: HasConnection> ImportAgent<T> {
             Some(n) => n,
             None => get_name_from_path(path)?,
         };
-        // Guard against pre-existing color scheme if update is false
+        // Guard against pre-existing wallpaper if update is false
         let exists_check = Wallpaper::select_by_name_if_exists(wall_name, self.conn.conn())?;
         if !update && let Some(_) = exists_check {
             return Err(internal_error(
@@ -91,7 +97,7 @@ impl<T: HasConnection> ImportAgent<T> {
             ));
         }
         // Create wallpaper directory in themedex directories
-        let buf = Path::new(&self.wallpaper_directory).join(wall_name);
+        let buf = self.wallpaper_directory.join(wall_name);
         let wall_dir_path = buf
             .to_str()
             .internal_err("Could not create wallpaper directory.")?;
@@ -137,18 +143,24 @@ impl<T: HasConnection> ImportAgent<T> {
         // image. If the database entry already exists we continue regardless as if this is true
         // but there is no image there then the entry would be broken.
         // Get color scheme
-        let Ok(color_scheme) =
-            ColorScheme::select_by_name(color_scheme_name, self.conn.conn())
+        let Ok(color_scheme) = ColorScheme::select_by_name(color_scheme_name, self.conn.conn())
         else {
-            return Err(ThemedexError::Internal(
-                format!("Color scheme {color_scheme_name} does not exist."),
-            ));
+            return Err(ThemedexError::Internal(format!(
+                "Color scheme {color_scheme_name} does not exist."
+            )));
         };
         // Get new file location
         let destination_path = get_variant_path(&wallpaper.path, &color_scheme.name, path)?;
+        let filename = destination_path
+            .file_name()
+            .and_then(|f| f.to_str())
+            .ok_or(ThemedexError::Internal(
+                "Failed to get file name from wallpaper destination path".into(),
+            ))?
+            .to_owned();
         copy_image(path.into(), destination_path, update)?;
         // Create variant in DB (ignore if fails due to unique constraint violation)
-        let mut wallpaper_version = WallpaperVersion::new(wallpaper, &color_scheme)?;
+        let mut wallpaper_version = WallpaperVersion::new(wallpaper, &color_scheme, filename)?;
         match wallpaper_version.insert_to_db(self.conn.conn()) {
             Ok(_) => Ok(()),
             Err(Database(SqliteFailure(e, _))) if e.extended_code == SQLITE_CONSTRAINT_UNIQUE => {
@@ -206,14 +218,15 @@ fn get_name_from_path(path: &str) -> Result<&str, ThemedexError> {
 }
 
 fn get_variant_path(
-    wallpaper_path: &str,
+    wallpaper_path: impl AsRef<Path>,
     color_scheme_name: &str,
     original_path: &str,
 ) -> Result<PathBuf, ThemedexError> {
     let extension = Path::new(original_path)
         .extension()
         .internal_err("Failed to get extension from wallpaper path, expected an image file?")?;
-    Ok(Path::new(&wallpaper_path)
+    Ok(wallpaper_path
+        .as_ref()
         .join(color_scheme_name)
         .with_extension(extension))
 }

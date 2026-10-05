@@ -1,6 +1,9 @@
 use std::io::ErrorKind;
 
-use crate::{common::test_fixtures::TestDir, database::test_structures::{TestDb, create_test_color_scheme}};
+use crate::{
+    common::test_fixtures::TestDir,
+    database::test_structures::{TestDb, create_test_color_scheme},
+};
 
 use super::*;
 
@@ -14,7 +17,8 @@ fn test_import_color_scheme_json() -> Result<(), ThemedexError> {
         conn: TestDb::new("test_import_color_scheme_json.db"),
     };
     // Act
-    let color_scheme = agent.import_color_scheme_json("./tests/schemes/catppuccin-mocha.json", None, false)?;
+    let color_scheme =
+        agent.import_color_scheme_json("./tests/schemes/catppuccin-mocha.json", None, false)?;
     // Assert
     assert_eq!(color_scheme.name, "catppuccin-mocha");
     Ok(())
@@ -53,7 +57,7 @@ fn test_import_wallpaper_and_version() {
     // Arrange
     let wallsdir = TestDir::new("wallpapers_test_import_wallpaper_and_version");
     let agent = ImportAgent {
-        wallpaper_directory: dbg!(wallsdir.to_string()),
+        wallpaper_directory: dbg!(wallsdir.path.clone()),
         conn: TestDb::new("test_import_wallpaper_and_version.db"),
     };
     let mut color_scheme = create_test_color_scheme("test-color-scheme");
@@ -69,7 +73,10 @@ fn test_import_wallpaper_and_version() {
         .unwrap();
     // Assert
     assert_eq!(wallpaper.name, "test-wall");
-    assert_eq!(absolute(&wallpaper.path).unwrap(), absolute(wallsdir.path.join("test-wall")).unwrap());
+    assert_eq!(
+        absolute(&wallpaper.path).unwrap(),
+        absolute(wallsdir.path.join("test-wall")).unwrap()
+    );
     assert!(metadata(&wallpaper.path).unwrap().is_dir());
     assert_eq!(version.wallpaper_id, wallpaper.id.unwrap());
     assert_eq!(version.color_scheme_id, color_scheme.id.unwrap());
@@ -81,7 +88,7 @@ fn test_import_wallpaper_and_version_with_name() {
     // Arrange
     let wallsdir = TestDir::new("wallpapers_test_import_wallpaper_and_version_with_name");
     let agent = ImportAgent {
-        wallpaper_directory: dbg!(wallsdir.to_string()),
+        wallpaper_directory: dbg!(wallsdir.path.clone()),
         conn: TestDb::new("test_import_wallpaper_and_version_with_name.db"),
     };
     let mut color_scheme = create_test_color_scheme("test-color-scheme");
@@ -97,7 +104,10 @@ fn test_import_wallpaper_and_version_with_name() {
         .unwrap();
     // Assert
     assert_eq!(wallpaper.name, "custom-name");
-    assert_eq!(absolute(&wallpaper.path).unwrap(), absolute(wallsdir.path.join("custom-name")).unwrap());
+    assert_eq!(
+        absolute(&wallpaper.path).unwrap(),
+        absolute(wallsdir.path.join("custom-name")).unwrap()
+    );
     assert!(metadata(&wallpaper.path).unwrap().is_dir());
     assert_eq!(version.wallpaper_id, wallpaper.id.unwrap());
     assert_eq!(version.color_scheme_id, color_scheme.id.unwrap());
@@ -108,7 +118,7 @@ fn test_import_wallpaper_and_version_overwrite() {
     // Arrange
     let wallsdir = TestDir::new("wallpapers_test_import_wallpaper_and_version_overwrite");
     let agent = ImportAgent {
-        wallpaper_directory: dbg!(wallsdir.to_string()),
+        wallpaper_directory: dbg!(wallsdir.path.clone()),
         conn: TestDb::new("test_import_wallpaper_and_version_overwrite.db"),
     };
     let mut color_scheme_1 = create_test_color_scheme("test-color-scheme");
@@ -134,7 +144,10 @@ fn test_import_wallpaper_and_version_overwrite() {
         .unwrap();
     // Assert
     assert_eq!(wallpaper.name, "custom-name");
-    assert_eq!(absolute(&wallpaper.path).unwrap(), absolute(wallsdir.path.join("custom-name")).unwrap());
+    assert_eq!(
+        absolute(&wallpaper.path).unwrap(),
+        absolute(wallsdir.path.join("custom-name")).unwrap()
+    );
     assert!(metadata(&wallpaper.path).unwrap().is_dir());
     assert_eq!(version.wallpaper_id, wallpaper.id.unwrap());
     assert_eq!(version.color_scheme_id, color_scheme_2.id.unwrap());

@@ -1,5 +1,8 @@
 use super::*;
-use crate::database::{test_structures::{TestDb, create_test_color_scheme}, utils::HasConnection};
+use crate::database::{
+    test_structures::{TestDb, create_test_color_scheme},
+    utils::HasConnection,
+};
 
 #[test]
 fn test_create_and_select_color_scheme() -> Result<(), ThemedexError> {
@@ -44,13 +47,15 @@ fn test_create_and_select_wallpaper_version() -> Result<(), ThemedexError> {
     wallpaper.insert_to_db(db.conn())?;
     assert!(color_scheme.id.unwrap() > 0);
     assert!(wallpaper.id.unwrap() > 0);
+    let name = "test-file-name".to_string();
     // Act
-    let mut wallpaper_version = WallpaperVersion::new(&wallpaper, &color_scheme)?;
+    let mut wallpaper_version = WallpaperVersion::new(&wallpaper, &color_scheme, name.clone())?;
     wallpaper_version.insert_to_db(db.conn())?;
     let selected = WallpaperVersion::select_by_id(wallpaper.id.unwrap(), db.conn())?;
     // Assert
     assert_eq!(selected.id, wallpaper_version.id);
     assert_eq!(selected.wallpaper_id, wallpaper_version.wallpaper_id);
     assert_eq!(selected.color_scheme_id, wallpaper_version.color_scheme_id);
+    assert_eq!(selected.filename, name);
     Ok(())
 }
