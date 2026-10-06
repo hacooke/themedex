@@ -1,5 +1,7 @@
 use clap::Args;
-use themedex::{common::ThemedexError, config::ThemedexConfig, database::utils::ThemedexDb, import::ImportAgent};
+use themedex::{
+    common::ThemedexError, config::ThemedexConfig, database::utils::ThemedexDb, import::ImportAgent,
+};
 
 #[derive(Args, Debug)]
 pub struct AddWallpaperVersionArgs {
@@ -17,12 +19,20 @@ pub struct AddWallpaperVersionArgs {
     update: bool,
 }
 
-pub fn execute(args: &AddWallpaperVersionArgs, config: &ThemedexConfig) -> Result<(), ThemedexError> {
+pub fn execute(
+    args: &AddWallpaperVersionArgs,
+    config: &ThemedexConfig,
+) -> Result<(), ThemedexError> {
     println!("{:?}", args);
     let agent = ImportAgent {
         wallpaper_directory: config.directories.wallpaper_directory.clone(),
         conn: ThemedexDb::new(&config.directories.database_path),
     };
-    agent.import_wallpaper_version_by_wall_name(&args.path, &args.wallpaper, &args.color_scheme, args.update)?;
+    agent.import_wallpaper_version_by_wall_name(
+        &args.path,
+        &args.wallpaper,
+        &args.color_scheme,
+        args.update,
+    )?;
     Ok(())
 }

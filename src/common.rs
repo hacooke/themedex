@@ -1,5 +1,5 @@
-pub mod path;
 pub mod models;
+pub mod path;
 
 use thiserror::Error;
 use toml::de::Error;
@@ -39,7 +39,7 @@ impl<T> ToInternal<T> for Option<T> {
 impl ThemedexError {
     pub fn user_message(&self) -> String {
         match self {
-            Self::Internal(msg) => msg.clone(), 
+            Self::Internal(msg) => msg.clone(),
             Self::Io(e) => e.to_string(),
             Self::Database(e) => e.to_string(),
             Self::Json(e) => e.to_string(),

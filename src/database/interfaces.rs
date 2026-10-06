@@ -193,5 +193,25 @@ impl DatabaseTable for WallpaperVersion {
     }
 }
 
+impl WallpaperVersion {
+    pub fn from_wallpaper_and_color_scheme(
+        wallpaper: &Wallpaper,
+        color_scheme: &ColorScheme,
+        conn: &Connection,
+    ) -> Result<Self, ThemedexError> {
+        let wallpaper_id = wallpaper.id.ok_or(ThemedexError::Internal(
+            "Tried to get ID for wallpaper which is not in database".into(),
+        ))?;
+        let color_scheme_id = color_scheme.id.ok_or(ThemedexError::Internal(
+            "Tried to get ID for color scheme which is not in database".into(),
+        ))?;
+        Ok(conn.query_one(
+        "SELECT id, wallpaper_id, color_scheme_id, filename FROM wallpaper_version WHERE wallpaper_id = ?1 AND color_scheme_id = ?2",
+        params![wallpaper_id, color_scheme_id],
+        Self::from_row,
+    )?)
+    }
+}
+
 #[cfg(test)]
 mod tests;

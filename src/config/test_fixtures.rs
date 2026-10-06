@@ -9,5 +9,6 @@ pub fn make_config() -> ThemedexConfig {
             rendered_config_directory: "tests/rendered".into(),
         },
         set_wallpaper_command: Default::default(),
+        scheme_change_commands: Default::default(),
     }
 }

@@ -2,6 +2,8 @@ pub mod add_color_scheme;
 pub mod add_wallpaper;
 pub mod add_wallpaper_version;
 pub mod apply_templates;
+pub mod apply_theme;
+pub mod apply_wallpaper;
 pub mod list_color_schemes;
 pub mod list_config;
 pub mod list_wallpaper_versions;
@@ -16,7 +18,8 @@ use add_wallpaper_version::AddWallpaperVersionArgs;
 use themedex::config::ThemedexConfig;
 
 use crate::cli::{
-    apply_templates::ApplyTemplatesArgs, list_color_schemes::ListColorSchemesArgs,
+    apply_templates::ApplyTemplatesArgs, apply_theme::ApplyThemeArgs,
+    apply_wallpaper::ApplyWallpaperArgs, list_color_schemes::ListColorSchemesArgs,
     list_wallpaper_versions::ListWallpaperVersionsArgs, list_wallpapers::ListWallpapersArgs,
     validate_templates::ValidateTemplatesArgs,
 };
@@ -43,6 +46,8 @@ pub enum ThemedexCommands {
     ListWallpaperVersions(ListWallpaperVersionsArgs),
     ValidateTemplates(ValidateTemplatesArgs),
     ApplyTemplates(ApplyTemplatesArgs),
+    ApplyWallpaper(ApplyWallpaperArgs),
+    ApplyTheme(ApplyThemeArgs),
     ListConfig,
 }
 
@@ -59,6 +64,8 @@ impl ThemedexCommands {
             Self::ListWallpaperVersions(args) => list_wallpaper_versions::execute(args, config),
             Self::ValidateTemplates(args) => validate_templates::execute(args, config),
             Self::ApplyTemplates(args) => apply_templates::execute(args, config),
+            Self::ApplyWallpaper(args) => apply_wallpaper::execute(args, config),
+            Self::ApplyTheme(args) => apply_theme::execute(args, config),
             Self::ListConfig => {
                 list_config::execute(config);
                 Ok(())

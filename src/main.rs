@@ -7,21 +7,17 @@ use themedex::{
     config::{ThemedexConfig, get_config_file},
 };
 
+// TODO add highlight feature -- highlight configurable outside of colour scheme (just number 0-23?)
+// Where stored? Not in DB, just transient for current theme application?
+// Could add to config, allow override at CLI, easily passed to all methods?
+// Add new kwarg to jinja templates -- highlight is var from config, else extra.highlight (default
+// set at color scheme level) else a fixed palette color
+
+// TODO add cli override of individual config options?
+
 fn main() {
     env_logger::init();
     let cli = Cli::parse();
-    // TODO: implement Cli::get_config to generate a get_config
-    // * Argument to set config location, else look in a default
-    // * Arguments to override config options
-
-    // let config = ThemedexConfig {
-    //     directories: DirectoryConfig {
-    //         wallpaper_directory: "tests/tempwalls".into(),
-    //         database_directory: "tests/temp.db".into(),
-    //         template_directory: "tests/templates_tmp".into(),
-    //         rendered_config_directory: "tests/rendered".into(),
-    //     },
-    // };
     let config_file = match get_config_file(cli.config, Default::default()) {
         Ok(config_file) => {
             println!("Using config file at location {}", config_file.display());

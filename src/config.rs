@@ -10,10 +10,21 @@ use serde::{Deserialize, Serialize};
 
 use crate::common::ThemedexError;
 
+// TODO add config option for wallpaper symlink location.
+// If provided, whenever wallpaper is set, update the symlink.
+// Also, reorganise command config, e.g.
+//
+// [commands]
+//
+// set_wallpaper_command = ["swww", "img", "{{path}}"]
+// post_scheme_change_commands = [["killall" "-SIGUSR2", "waybar"]]
+// wallpaper_symlink_location = "/home/harry/documents/photos/wallpapers/current.png
+
 #[derive(Debug, Deserialize, Serialize, Default)]
 #[serde(default)]
 pub struct ThemedexConfig {
     pub set_wallpaper_command: WallpaperCommandConfig,
+    pub scheme_change_commands: Vec<Vec<String>>,
     pub directories: DirectoryConfig,
 }
 

@@ -51,7 +51,31 @@ fn test_create_and_select_wallpaper_version() -> Result<(), ThemedexError> {
     // Act
     let mut wallpaper_version = WallpaperVersion::new(&wallpaper, &color_scheme, name.clone())?;
     wallpaper_version.insert_to_db(db.conn())?;
-    let selected = WallpaperVersion::select_by_id(wallpaper.id.unwrap(), db.conn())?;
+    let selected = WallpaperVersion::select_by_id(wallpaper_version.id.unwrap(), db.conn())?;
+    // Assert
+    assert_eq!(selected.id, wallpaper_version.id);
+    assert_eq!(selected.wallpaper_id, wallpaper_version.wallpaper_id);
+    assert_eq!(selected.color_scheme_id, wallpaper_version.color_scheme_id);
+    assert_eq!(selected.filename, name);
+    Ok(())
+}
+
+#[test]
+fn test_get_version_from_wallpaper_and_color_scheme() -> Result<(), ThemedexError> {
+    // Arrange
+    let db = TestDb::new("test_get_version_from_wallpaper_and_color_scheme");
+    let mut color_scheme = create_test_color_scheme("test-color-scheme");
+    color_scheme.insert_to_db(db.conn())?;
+    let mut wallpaper = Wallpaper::new(String::from("test"), String::from("testpath"));
+    wallpaper.insert_to_db(db.conn())?;
+    assert!(color_scheme.id.unwrap() > 0);
+    assert!(wallpaper.id.unwrap() > 0);
+    let name = "test-file-name".to_string();
+    let mut wallpaper_version = WallpaperVersion::new(&wallpaper, &color_scheme, name.clone())?;
+    wallpaper_version.insert_to_db(db.conn())?;
+    // Act
+    let selected =
+        WallpaperVersion::from_wallpaper_and_color_scheme(&wallpaper, &color_scheme, db.conn())?;
     // Assert
     assert_eq!(selected.id, wallpaper_version.id);
     assert_eq!(selected.wallpaper_id, wallpaper_version.wallpaper_id);

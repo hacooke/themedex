@@ -1,6 +1,6 @@
 use clap::Args;
 use themedex::{
-    apply::templates::apply_all_templates,
+    apply::{post_change_commands::run_post_change_commands, templates::apply_all_templates},
     common::ThemedexError,
     config::ThemedexConfig,
     database::{
@@ -26,5 +26,6 @@ pub fn execute(args: &ApplyTemplatesArgs, config: &ThemedexConfig) -> Result<(),
         )));
     };
     apply_all_templates(&color_scheme.colors, config)?;
+    run_post_change_commands(config)?;
     Ok(())
 }
